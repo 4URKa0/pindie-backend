@@ -2,17 +2,23 @@
 const usersRouter = require('express').Router();
 
 // Импортируем вспомогательные функции
-const findAllUsers = require('../middlewares/users');
-const sendAllUsers = require('../controllers/users');
+const {findAllUsers, filterPassword, findUserById, checkEmptyNameAndEmailAndPassword, hashPassword, createUser, updateUser, deleteUser} = require('../middlewares/users');
+const {sendAllUsers, sendUserById, sendUserCreated, sendUserUpdated, sendUserDeleted, sendMe} = require('../controllers/users');
+const { checkAuth } = require("../middlewares/auth.js");
+const { checkIsUserExists } = require('../middlewares/categories.js');
 
 // Обрабатываем GET-запрос с роутом '/users'
-usersRouter.get('/users', findAllUsers, sendAllUsers);
-usersRouter.get("/users/:id", findUserById, sendUserById);
+usersRouter.get("/users", findAllUsers, filterPassword, sendAllUsers);
+usersRouter.get("/users/:id", findUserById, filterPassword, sendUserById);
+usersRouter.get("/me", checkAuth, sendMe);
+
 usersRouter.post(
   "/users",
   findAllUsers,
   checkIsUserExists,
   checkEmptyNameAndEmailAndPassword,
+  checkAuth,
+  hashPassword,
   createUser,
   sendUserCreated
 );
@@ -20,14 +26,16 @@ usersRouter.post(
 usersRouter.put(
   "/users/:id",
   checkEmptyNameAndEmail,
+  checkAuth,
   updateUser,
   sendUserUpdated
 );
 
-gamesRouter.delete(
-  "/users/:id", // Слушаем запросы по эндпоинту
-  deleteUser,
-  sendUserDeleted // Тут будут функция удаления элементов из MongoDB и ответ клиенту
+usersRouter.delete(
+    "/users/:id",
+    checkAuth,
+    deleteUser,
+    sendUserDeleted
 ); 
 
 // Экспортируем роут для использования в приложении — app.js
