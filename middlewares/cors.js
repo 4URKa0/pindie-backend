@@ -1,4 +1,4 @@
-const allowedCors = ["https://pindie-theme-8.nomoredomainswork.ru"];
+const allowedCors = ["https://realpindie.nomorepartiesco.ru"];
 
 function cors(req, res, next) {
   const { origin } = req.headers;
